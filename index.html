@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collocation Lab — Make Words Stick</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
+  <style>
+    :root{--paper:#e9e5d9;--ink:#20201e;--red:#d94b39;--yellow:#f0c848;--muted:#6c6a62;--line:#282824}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:"DM Sans",sans-serif;overflow-x:hidden}
+    body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:20;opacity:.16;background-image:url("https://www.transparenttextures.com/patterns/asfalt-light.png")}
+    button,input,select{font-family:"DM Sans",sans-serif}
+    button{cursor:pointer}
+    button:focus-visible,a:focus-visible{outline:3px solid var(--red);outline-offset:4px}
+    a{color:inherit}
+
+    /* ── API Key Modal ── */
+    .api-modal-overlay{position:fixed;inset:0;background:rgba(32,32,30,.7);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:1;transition:opacity .3s}
+    .api-modal-overlay.hidden{opacity:0;pointer-events:none}
+    .api-modal{background:var(--paper);border:3px solid var(--ink);box-shadow:12px 12px 0 var(--ink);padding:44px;max-width:540px;width:92%;position:relative}
+    .api-modal h3{font-family:"Space Grotesk",sans-serif;font-size:28px;letter-spacing:-1.5px;margin:0 0 10px}
+    .api-modal p{color:var(--muted);line-height:1.6;font-size:14px;margin:0 0 18px}
+    .api-modal select,.api-modal input{width:100%;border:2px solid var(--ink);background:#fffdf6;padding:13px;font-size:14px;margin-bottom:14px}
+    .api-modal select:focus,.api-modal input:focus{outline:3px solid var(--red);outline-offset:2px}
+    .api-modal .modal-actions{display:flex;gap:10px;margin-top:6px}
+    .api-modal .save-key-btn{flex:1;border:2px solid var(--ink);background:var(--red);color:#fff;padding:14px;font-weight:800;text-transform:uppercase;letter-spacing:1px;font-size:12px;box-shadow:4px 4px 0 var(--ink);transition:transform .15s,box-shadow .15s}
+    .api-modal .save-key-btn:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+    .api-modal .skip-btn{border:2px solid var(--ink);background:transparent;padding:14px 20px;font-weight:800;text-transform:uppercase;letter-spacing:1px;font-size:12px}
+    .api-modal .skip-btn:hover{background:#e1dcd0}
+    .api-key-hint{font-size:12px;color:var(--muted);margin-top:12px;line-height:1.5}
+    .api-key-hint a{color:var(--red);font-weight:700}
+
+    /* ── Settings float ── */
+    .settings-btn{position:fixed;bottom:24px;right:24px;z-index:50;background:var(--ink);color:#fff;border:2px solid var(--ink);width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:4px 4px 0 var(--red);transition:transform .2s}
+    .settings-btn:hover{transform:rotate(90deg)}
+    .settings-btn i{width:22px;height:22px}
+
+    /* ── Layout ── */
+    .wrap{max-width:1200px;margin:auto;padding:0 38px}
+
+    /* ── Topbar ── */
+    .topbar{border-bottom:2px solid var(--line);background:#ece8dc}
+    .topbar .wrap{height:78px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .brand{font-family:"Space Grotesk",sans-serif;font-size:22px;font-weight:700;letter-spacing:-1.2px;text-decoration:none;white-space:nowrap}
+    .brand-mark{display:inline-block;background:var(--red);color:#fff;transform:rotate(-8deg);padding:1px 7px;margin-right:7px}
+    .nav{display:flex;align-items:center;gap:34px;font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase}
+    .nav a{text-decoration:none}.nav a:hover{text-decoration:underline;text-decoration-thickness:2px}
+    .nav-cta{background:var(--ink);color:#fff;padding:12px 18px;border:2px solid var(--ink)}
+
+    /* ── Hero ── */
+    .hero{position:relative;min-height:560px;border-bottom:2px solid var(--line);overflow:hidden;background:radial-gradient(circle at 80% 35%,#f4d357 0 18%,transparent 18.2%),var(--paper)}
+    .hero:after{content:"";position:absolute;right:-70px;bottom:-170px;width:520px;height:520px;border:3px solid var(--ink);border-radius:50%;opacity:.22}
+    .hero-grid{display:grid;grid-template-columns:1.2fr .8fr;min-height:560px;align-items:center;position:relative;z-index:1}
+    .eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+    .eyebrow:before{content:"";width:24px;height:3px;background:var(--red)}
+    h1,h2,h3,p{margin-top:0}
+    h1,h2,h3{font-family:"Space Grotesk",sans-serif}
+    h1{font-size:clamp(64px,8vw,116px);line-height:.91;letter-spacing:-8px;margin:27px 0 24px;font-weight:700}
+    h1 em{font-style:normal;color:var(--red);position:relative}
+    h1 em:after{content:"";position:absolute;height:7px;background:var(--red);left:4px;right:0;bottom:-8px;transform:rotate(-2deg)}
+    .hero-copy{font-size:17px;line-height:1.65;max-width:475px;color:#4c4b45}
+    .maker-credit{margin-top:18px;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+    .maker-credit span{color:var(--red)}
+    .primary-btn{border:2px solid var(--ink);background:var(--red);color:white;padding:17px 23px;display:inline-flex;align-items:center;gap:25px;font-weight:800;text-transform:uppercase;letter-spacing:1px;box-shadow:5px 5px 0 var(--ink);transition:transform .2s,box-shadow .2s;text-decoration:none;font-size:12px;margin-top:18px}
+    .primary-btn:hover{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--ink)}
+    .hero-art{position:relative;min-height:440px;display:flex;align-items:center;justify-content:center}
+    .scribble{position:absolute;font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:16px;transform:rotate(-12deg);left:12%;top:13%}
+    .scribble:after{content:"↘";font-size:45px;display:block;margin-left:80px}
+    .poster{width:310px;background:#242422;color:#f7f0de;border:2px solid #242422;box-shadow:13px 14px 0 var(--red);padding:26px;transform:rotate(7deg);position:relative}
+    .poster:before{content:"";position:absolute;width:74px;height:24px;background:#ddd1a2;opacity:.8;top:-12px;left:115px;transform:rotate(-5deg)}
+    .poster-small{font-size:11px;font-weight:800;letter-spacing:3px;color:var(--yellow);border-bottom:1px solid #77766f;padding-bottom:18px}
+    .poster-word{font-family:"Space Grotesk",sans-serif;font-size:63px;line-height:.92;font-weight:700;letter-spacing:-5px;margin:32px 0}
+    .poster-word span{color:var(--yellow)}
+    .poster-foot{border-top:1px solid #77766f;padding-top:17px;font-size:12px;letter-spacing:1px;display:flex;justify-content:space-between}
+    .sticker{position:absolute;right:0;bottom:32px;background:var(--yellow);border:2px solid var(--ink);padding:18px 15px;border-radius:50%;font-size:12px;font-weight:800;text-align:center;transform:rotate(-18deg);box-shadow:3px 4px 0 var(--ink)}
+
+    /* ── Ticker ── */
+    .ticker{background:var(--ink);color:var(--paper);overflow:hidden;white-space:nowrap;padding:15px 0;font-family:"Space Grotesk",sans-serif;font-weight:700;letter-spacing:2px;font-size:12px}
+    .ticker-track{display:inline-flex;animation:ticker-scroll 25s linear infinite}
+    .ticker span{margin-right:40px}.ticker b{color:var(--yellow);margin-right:40px}
+    @keyframes ticker-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+    /* ── Sections ── */
+    section{scroll-margin-top:20px}
+    .section-pad{padding:90px 0}
+    .section-head{display:flex;justify-content:space-between;align-items:end;gap:25px;margin-bottom:34px}
+    .section-number{font-size:12px;font-weight:800;letter-spacing:2px;color:var(--red)}
+    h2{font-size:clamp(38px,5vw,65px);line-height:1;letter-spacing:-3.5px;margin:12px 0 0}
+    .section-desc{max-width:305px;line-height:1.6;color:var(--muted);font-size:14px;margin:0}
+
+    /* ── Section 01: Basics ── */
+    .category-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .category{background:#f5f1e7;border:2px solid var(--ink);padding:25px;text-align:left;min-height:205px;display:flex;flex-direction:column;align-items:flex-start;transition:transform .2s,box-shadow .2s}
+    .category:hover,.category.active{transform:translate(-3px,-3px);box-shadow:6px 6px 0 var(--ink)}
+    .category.active{background:var(--yellow)}
+    .cat-top{width:100%;display:flex;justify-content:space-between;font-size:12px;font-weight:800;letter-spacing:1px}
+    .cat-top i{width:18px;height:18px}
+    .category strong{font-family:"Space Grotesk",sans-serif;font-size:29px;letter-spacing:-1.5px;margin-top:auto}
+    .category small{font-size:12px;color:#64625a;margin-top:7px}
+    .lesson{margin-top:23px;display:grid;grid-template-columns:1fr 1fr;background:#e1dcd0;border:2px solid var(--ink);min-height:250px}
+    .lesson-left{padding:32px 36px;border-right:2px solid var(--ink)}
+    .mini-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;font-weight:800;color:var(--red)}
+    .lesson-left h3{font-size:34px;letter-spacing:-1.5px;margin:15px 0 10px}
+    .lesson-left p{color:#55534d;line-height:1.6;font-size:14px;max-width:430px;margin:0}
+    .lesson-right{padding:30px 36px;display:flex;flex-direction:column;justify-content:center;gap:10px}
+    .example{display:flex;align-items:center;gap:12px;font-size:17px;font-weight:700}
+    .example i{width:17px;height:17px;color:var(--red)}
+    .example span{color:#77736a;font-size:13px;font-weight:500;margin-left:auto}
+    .new-examples-btn{margin-top:14px;border:2px solid var(--ink);background:var(--yellow);padding:12px 18px;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;box-shadow:3px 3px 0 var(--ink);transition:transform .15s,box-shadow .15s;display:inline-flex;align-items:center;gap:8px}
+    .new-examples-btn:hover{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+    .new-examples-btn:disabled{opacity:.6;cursor:wait}
+    .new-examples-btn i{width:14px;height:14px}
+
+    /* ── Loading spinner ── */
+    .spinner{display:inline-block;width:16px;height:16px;border:3px solid var(--ink);border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading-text{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--muted);padding:16px 0}
+
+    /* ── Section 02: Practice ── */
+    .practice{background:#d8d3c6;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)}
+    .practice .section-head{margin-bottom:29px}
+    .practice-shell{background:#f2eee4;border:2px solid var(--ink);box-shadow:8px 8px 0 var(--ink)}
+    .practice-tabs{display:flex;border-bottom:2px solid var(--ink)}
+    .tab{border:0;border-right:2px solid var(--ink);background:transparent;padding:20px 30px;font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase}
+    .tab.active{background:var(--yellow)}
+    .tab:hover:not(.active){background:#e6dfcf}
+    .practice-body{display:grid;grid-template-columns:minmax(0,1fr) 260px;min-height:420px}
+    .game{padding:38px 42px}
+    .game-top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:27px;font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+    .pill{background:var(--ink);color:#fff;padding:8px 12px}
+    .question{font-family:"Space Grotesk",sans-serif;font-size:clamp(26px,3.6vw,42px);font-weight:700;letter-spacing:-2px;line-height:1.2;margin:0 0 12px}
+    .question u{text-decoration:none;border-bottom:4px solid var(--red);padding:0 8px}
+    .hint{font-size:13px;color:var(--muted);margin-bottom:27px;line-height:1.5}
+    .choices{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .choice,.match-btn{border:2px solid var(--ink);background:#fbf8f0;padding:17px 18px;text-align:left;font-size:15px;font-weight:800;transition:background .15s,transform .15s}
+    .choice:hover:not(:disabled),.match-btn:hover:not(:disabled){background:var(--yellow);transform:translateY(-2px)}
+    .choice.correct,.match-btn.matched{background:#b8d6ad}
+    .choice.wrong,.match-btn.wrong{background:#e9a79d}
+    .choice:disabled,.match-btn:disabled{cursor:default}
+    .feedback{min-height:48px;margin:20px 0 0;font-size:14px;font-weight:700;line-height:1.5}
+    .feedback.good{color:#3e6835}.feedback.bad{color:#a43829}
+    .next-btn,.reset-btn{background:var(--ink);color:#fff;border:2px solid var(--ink);padding:12px 18px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px}
+    .next-btn:hover,.reset-btn:hover{background:var(--red)}
+    .next-btn[hidden],.game-panel[hidden]{display:none}
+    .generate-quiz-btn{border:2px solid var(--ink);background:var(--yellow);color:var(--ink);padding:12px 18px;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-top:12px;display:inline-flex;align-items:center;gap:8px}
+    .generate-quiz-btn:hover{background:var(--red);color:#fff}
+    .generate-quiz-btn:disabled{opacity:.6;cursor:wait}
+    .sidebar{border-left:2px solid var(--ink);padding:36px 28px;background:#e8e1d1}
+    .sidebar-label{font-size:11px;letter-spacing:2px;font-weight:800;text-transform:uppercase}
+    .score{font-family:"Space Grotesk",sans-serif;font-size:71px;font-weight:700;letter-spacing:-6px;line-height:1;margin:18px 0 7px}
+    .score span{font-size:26px;letter-spacing:-1px;color:#817d71}
+    .score-caption{font-size:13px;color:var(--muted);line-height:1.5}
+    .progress-track{height:10px;background:#c7c0b0;border:1px solid var(--ink);margin:24px 0 32px}
+    .progress-fill{height:100%;width:0;background:var(--red);transition:width .3s}
+    .side-note{border-top:2px solid var(--ink);padding-top:22px;font-size:13px;line-height:1.6}
+    .side-note strong{display:block;font-size:11px;letter-spacing:1.5px;margin-bottom:8px}
+    .side-note p{margin:0}
+    .match-columns{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .match-column{display:grid;gap:10px;align-content:start}
+    .match-heading{font-size:11px;letter-spacing:1.5px;font-weight:800;margin-bottom:5px;text-transform:uppercase}
+    .match-btn{text-align:center}
+    .match-btn.selected{background:var(--yellow);box-shadow:3px 3px 0 var(--ink)}
+    .match-btn.matched{opacity:.65}
+    .match-actions{margin-top:22px}
+
+    /* ── Section 03: Lexical Lens (2 cards only) ── */
+    .lens{background:#262624;color:#f1ebdc;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)}
+    .lens .section-desc{color:#bcb7a9}.lens h2{max-width:750px}.lens .section-number{color:var(--yellow)}
+    .lens-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+    .lens-card{background:#eee9dc;color:var(--ink);border:2px solid #171715;padding:28px;box-shadow:6px 6px 0 var(--red);min-width:0}
+    .lens-card:nth-child(2){box-shadow:6px 6px 0 var(--yellow)}
+    .lens-card h3{font-size:28px;letter-spacing:-1.5px;margin:10px 0}
+    .lens-card p{line-height:1.55;font-size:14px}
+    .lens-kicker{font-size:11px;font-weight:800;letter-spacing:2px;color:var(--red)}
+    .lens-form{display:flex;gap:8px;margin:20px 0 14px}
+    .lens-form input{min-width:0;background:#fffdf6;border:2px solid var(--ink);padding:12px;font-size:14px;color:var(--ink);flex:1;width:100%}
+    .lens-form button,.lens-action{border:2px solid var(--ink);background:var(--yellow);padding:11px 14px;font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;white-space:nowrap}
+    .lens-form button:hover,.lens-action:hover{background:var(--red);color:#fff}
+    .lens-form input:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+    .lens-result{border-top:2px solid var(--ink);padding-top:16px;min-height:135px}
+    .lens-result strong{font-family:"Space Grotesk",sans-serif;font-size:21px}
+    .lens-result p{margin:9px 0}
+    .lens-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+    .lens-tag{border:1px solid var(--ink);padding:6px 8px;background:#ded7c6;font-size:11px;font-weight:800}
+    .lens-context{display:flex;flex-wrap:wrap;gap:8px;margin:17px 0}
+    .context-btn{border:2px solid var(--ink);background:#fffdf6;padding:9px 11px;font-size:11px;font-weight:800}
+    .context-btn.active{background:var(--yellow)}
+    .lens-footnote{color:#c5bdad;font-size:12px;margin:27px 0 0;line-height:1.5}
+    .ai-badge{display:inline-flex;align-items:center;gap:5px;background:var(--red);color:#fff;padding:3px 8px;border-radius:2px;font-size:10px;font-weight:800;letter-spacing:1px;margin-left:8px;vertical-align:middle}
+
+    /* ── Footer ── */
+    footer{background:var(--ink);color:#f1ebdc;padding:35px 0}
+    footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px}
+    .footer-note{font-size:12px;color:#aaa79c}
+
+    /* ── Status indicator ── */
+    .ai-status{position:fixed;top:20px;right:20px;z-index:100;padding:8px 14px;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;border:2px solid var(--ink);display:flex;align-items:center;gap:8px}
+    .ai-status.connected{background:#b8d6ad;color:#2d4d25}
+    .ai-status.disconnected{background:#e9a79d;color:#6b2920}
+    .ai-dot{width:8px;height:8px;border-radius:50%;background:currentColor}
+
+    /* ── Responsive ── */
+    @media(max-width:800px){
+      .hero-grid{grid-template-columns:1fr}.hero{min-height:0}.hero-grid{padding-top:70px;padding-bottom:60px}
+      .hero-art{min-height:380px}.category-grid{grid-template-columns:1fr}.category{min-height:145px}
+      .lesson{grid-template-columns:1fr}.lesson-left{border-right:0;border-bottom:2px solid var(--ink)}
+      .practice-body{grid-template-columns:1fr}.sidebar{border-left:0;border-top:2px solid var(--ink)}.score{font-size:55px}
+      .lens-grid{grid-template-columns:1fr}
+    }
+    @media(max-width:560px){
+      .wrap{padding:0 20px}.topbar .wrap{height:68px}.nav{gap:12px}
+      .nav a:not(.nav-cta){display:none}.nav-cta{padding:10px;font-size:10px}.brand{font-size:19px}
+      h1{font-size:64px;letter-spacing:-5px}.hero-art{min-height:330px}
+      .poster{width:250px;padding:22px}.poster-word{font-size:52px}.sticker{right:0;bottom:7px}
+      .section-pad{padding:65px 0}.section-head{display:block}.section-desc{margin-top:20px}
+      .game{padding:27px 20px}.tab{padding:16px 15px;font-size:11px;flex:1}
+      .choices{grid-template-columns:1fr}.lesson-left,.lesson-right{padding:25px}
+      .match-columns{gap:10px}.match-btn{padding:14px 8px;font-size:13px}
+      footer .wrap{display:block}.footer-note{margin-top:16px}
+      .api-modal{padding:28px}.lens-form{flex-wrap:wrap}.lens-form button{width:100%}
+      .settings-btn{bottom:16px;right:16px;width:44px;height:44px}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════ API KEY MODAL ══════════════════ -->
+<div id="api-modal-overlay" class="api-modal-overlay">
+  <div class="api-modal">
+    <span class="section-number">✳ AI ENGINE SETUP</span>
+    <h3>Pilih Provider AI.</h3>
+    <p>Gunakan provider AI pilihanmu. <strong>Groq</strong> sangat disarankan: 100% gratis, super cepat (~0.3 detik), dan tidak pernah terkena limit <em>"ai busy"</em>.</p>
+    
+    <label for="provider-select" class="mini-label" style="display:block;margin-bottom:6px">PROVIDER AI</label>
+    <select id="provider-select">
+      <option value="groq" selected>⚡ Groq (Gratis & Sangat Cepat — Recommended)</option>
+      <option value="openrouter">🌐 OpenRouter (Model Gratis Llama 3.3)</option>
+      <option value="openai">🧠 OpenAI (GPT-4o mini)</option>
+      <option value="gemini">✨ Google Gemini</option>
+    </select>
+
+    <label for="api-key-input" class="mini-label" style="display:block;margin-bottom:6px">API KEY</label>
+    <input type="password" id="api-key-input" placeholder="Paste Groq API Key di sini (gsk_...)" autocomplete="off">
+    
+    <div class="modal-actions">
+      <button class="save-key-btn" id="save-key-btn" type="button">SIMPAN & AKTIFKAN ↗</button>
+      <button class="skip-btn" id="skip-key-btn" type="button">LEWATI</button>
+    </div>
+    <p class="api-key-hint" id="api-key-hint">
+      Dapatkan API Key gratis di <a id="api-key-link" href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a>. Cukup daftar & buat key dalam 30 detik!
+    </p>
+  </div>
+</div>
+
+<!-- ══════════════════ AI STATUS ══════════════════ -->
+<div id="ai-status" class="ai-status disconnected">
+  <span class="ai-dot"></span> <span id="ai-status-text">AI OFFLINE</span>
+</div>
+
+<!-- ══════════════════ SETTINGS BUTTON ══════════════════ -->
+<button class="settings-btn" id="settings-btn" type="button" title="Ubah API Key">
+  <i data-lucide="settings" aria-hidden="true"></i>
+</button>
+
+<!-- ══════════════════ HEADER ══════════════════ -->
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="#beranda"><span class="brand-mark">C.</span> COLLOCATION LAB</a>
+    <nav class="nav" aria-label="Navigasi utama">
+      <a href="#materi">Materi</a>
+      <a href="#latihan">Latihan</a>
+      <a href="#lens">Lexical Lens</a>
+      <a class="nav-cta" href="#latihan">MULAI BELAJAR ↗</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- ══════════════════ HERO ══════════════════ -->
+  <section id="beranda" class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow">ENGLISH, BUT MAKE IT NATURAL</div>
+        <h1>WORDS<br>WORK <em>BETTER</em><br>TOGETHER.</h1>
+        <p class="hero-copy">Bukan cuma hafal kata. Pelajari pasangan kata yang benar-benar dipakai penutur asli—satu kombinasi keren dalam satu waktu.</p>
+        <div class="maker-credit">DIBUAT OLEH <span>MUHAMAD IBNU RIDWAN</span></div>
+        <a class="primary-btn" href="#latihan">COBA LATIHAN <i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="scribble">NOT "DO A DECISION"</div>
+        <div class="poster">
+          <div class="poster-small">WORD PAIR / NO. 001</div>
+          <div class="poster-word">MAKE<br><span>A</span><br>DECISION<span>.</span></div>
+          <div class="poster-foot"><span>SAY IT RIGHT.</span><span>✳ 2026</span></div>
+        </div>
+        <div class="sticker">SOUNDS<br>NATURAL<br>★</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════ TICKER ══════════════════ -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      <span>MAKE A DECISION</span><b>✳</b><span>HEAVY RAIN</span><b>✳</b><span>DEEPLY CONCERNED</span><b>✳</b><span>TAKE A BREAK</span><b>✳</b><span>STRONG COFFEE</span><b>✳</b><span>FULLY AWARE</span><b>✳</b>
+      <span>MAKE A DECISION</span><b>✳</b><span>HEAVY RAIN</span><b>✳</b><span>DEEPLY CONCERNED</span><b>✳</b><span>TAKE A BREAK</span><b>✳</b><span>STRONG COFFEE</span><b>✳</b><span>FULLY AWARE</span><b>✳</b>
+    </div>
+  </div>
+
+  <!-- ══════════════════ SECTION 01: THE BASICS ══════════════════ -->
+  <section id="materi" class="section-pad">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <span class="section-number">01 / THE BASICS</span>
+          <h2>Kenali polanya<span style="color:var(--red)">.</span></h2>
+        </div>
+        <p class="section-desc">Collocation adalah kata-kata yang secara alami sering muncul bersama. Pilih pola untuk melihat contohnya.</p>
+      </div>
+      <div class="category-grid" role="group" aria-label="Pilih pola collocation">
+        <button class="category active" type="button" data-category="verb" aria-pressed="true">
+          <span class="cat-top">01 / ACTION <i data-lucide="arrow-up-right" aria-hidden="true"></i></span>
+          <strong>Verb + Noun</strong>
+          <small>make a decision · take a break</small>
+        </button>
+        <button class="category" type="button" data-category="adjective" aria-pressed="false">
+          <span class="cat-top">02 / DESCRIPTION <i data-lucide="arrow-up-right" aria-hidden="true"></i></span>
+          <strong>Adjective + Noun</strong>
+          <small>heavy rain · strong coffee</small>
+        </button>
+        <button class="category" type="button" data-category="adverb" aria-pressed="false">
+          <span class="cat-top">03 / INTENSITY <i data-lucide="arrow-up-right" aria-hidden="true"></i></span>
+          <strong>Adverb + Adjective</strong>
+          <small>deeply concerned · fully aware</small>
+        </button>
+      </div>
+      <div class="lesson" aria-live="polite">
+        <div class="lesson-left">
+          <span class="mini-label">POLA TERPILIH</span>
+          <h3 id="lesson-title">Verb + Noun</h3>
+          <p id="lesson-description">Kata kerja tertentu lebih cocok dengan kata benda tertentu. Kita mengatakan "make a decision", bukan "do a decision".</p>
+        </div>
+        <div class="lesson-right">
+          <div id="lesson-examples"></div>
+          <button class="new-examples-btn" id="new-examples-btn" type="button">
+            <i data-lucide="sparkles" aria-hidden="true"></i> CONTOH BARU (AI)
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════ SECTION 02: PUT IT TO WORK ══════════════════ -->
+  <section id="latihan" class="section-pad practice">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <span class="section-number">02 / PUT IT TO WORK</span>
+          <h2>Giliran kamu<span style="color:var(--red)">.</span></h2>
+        </div>
+        <p class="section-desc">Belajar paling cepat saat kamu mencoba. Soal selalu berbeda berkat AI.</p>
+      </div>
+      <div class="practice-shell">
+        <div class="practice-tabs" role="tablist" aria-label="Mode latihan">
+          <button id="quiz-tab" class="tab active" role="tab" aria-selected="true" aria-controls="quiz-panel" type="button">01 / PILIH KATA</button>
+          <button id="match-tab" class="tab" role="tab" aria-selected="false" aria-controls="match-panel" type="button">02 / PASANGKAN</button>
+        </div>
+        <div class="practice-body">
+          <div>
+            <!-- Quiz Panel -->
+            <div id="quiz-panel" class="game game-panel" role="tabpanel" aria-labelledby="quiz-tab">
+              <div class="game-top">
+                <span>COMPLETE THE PHRASE</span>
+                <span id="question-count" class="pill">01 / 06</span>
+              </div>
+              <p id="question" class="question"></p>
+              <p id="quiz-hint" class="hint"></p>
+              <div id="choices" class="choices"></div>
+              <p id="quiz-feedback" class="feedback" role="status" aria-live="polite"></p>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+                <button id="next-button" class="next-btn" type="button" hidden>Pertanyaan berikutnya →</button>
+                <button id="generate-quiz-btn" class="generate-quiz-btn" type="button">
+                  <i data-lucide="sparkles" aria-hidden="true" style="width:14px;height:14px"></i> SOAL BARU (AI)
+                </button>
+              </div>
+            </div>
+            <!-- Match Panel -->
+            <div id="match-panel" class="game game-panel" role="tabpanel" aria-labelledby="match-tab" hidden>
+              <div class="game-top">
+                <span>FIND THE NATURAL PAIR</span>
+                <span id="match-count" class="pill">0 / 4</span>
+              </div>
+              <p class="question">Cari pasangannya<span style="color:var(--red)">.</span></p>
+              <p class="hint">Pilih satu kata di kiri, lalu pasangannya di kanan.</p>
+              <div class="match-columns">
+                <div id="match-left" class="match-column"><span class="match-heading">KATA PERTAMA</span></div>
+                <div id="match-right" class="match-column"><span class="match-heading">KATA KEDUA</span></div>
+              </div>
+              <p id="match-feedback" class="feedback" role="status" aria-live="polite"></p>
+              <div class="match-actions" style="display:flex;gap:10px;flex-wrap:wrap">
+                <button id="match-reset" class="reset-btn" type="button">Ulangi pasangan ↺</button>
+                <button id="generate-match-btn" class="generate-quiz-btn" type="button">
+                  <i data-lucide="sparkles" aria-hidden="true" style="width:14px;height:14px"></i> PASANGAN BARU (AI)
+                </button>
+              </div>
+            </div>
+          </div>
+          <aside class="sidebar" aria-label="Progres latihan">
+            <div class="sidebar-label">YOUR SESSION / PROGRESS</div>
+            <div id="score" class="score">0<span>/6</span></div>
+            <p id="score-caption" class="score-caption">Jawaban benar di latihan pilih kata.</p>
+            <div class="progress-track" role="progressbar" aria-label="Progres kuis" aria-valuemin="0" aria-valuemax="6" aria-valuenow="0" id="progress-track">
+              <div id="progress-fill" class="progress-fill"></div>
+            </div>
+            <div class="side-note">
+              <strong>✳ AI-POWERED</strong>
+              <p>Setiap sesi menghasilkan soal baru dengan Gemini AI. Klik tombol "Soal Baru" untuk tantangan yang belum pernah kamu lihat.</p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════ SECTION 03: LEXICAL LENS (2 cards) ══════════════════ -->
+  <section id="lens" class="section-pad lens">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <span class="section-number">03 / LEXICAL LENS</span>
+          <h2>Jangan cuma hafal.<br>Selidiki <span style="color:var(--yellow)">alasannya.</span></h2>
+        </div>
+        <p class="section-desc">Lihat gambaran mental di balik pasangan kata, lalu temukan cara mengatakannya secara alami dalam konteks duniamu.</p>
+      </div>
+      <div class="lens-grid">
+        <!-- Card 1: Why Deconstructor -->
+        <article class="lens-card">
+          <span class="lens-kicker">01 / THE WHY DECONSTRUCTOR <span class="ai-badge">✳ AI</span></span>
+          <h3>Kenapa kata ini cocok?</h3>
+          <p>Masukkan frasa bahasa Inggris apa pun—AI akan menganalisis metafora dan logika di balik pasangan kata tersebut.</p>
+          <form id="why-form" class="lens-form">
+            <input id="why-input" placeholder='e.g. "shatter a dream"' required maxlength="80">
+            <button type="submit">BEDAH ↗</button>
+          </form>
+          <div id="why-result" class="lens-result" role="status" aria-live="polite">
+            <p style="color:var(--muted)">Ketik frasa apa saja dan AI akan menjelaskan kenapa kata-kata itu cocok satu sama lain.</p>
+          </div>
+        </article>
+
+        <!-- Card 2: Contextual Interest Lens -->
+        <article class="lens-card">
+          <span class="lens-kicker">02 / CONTEXTUAL INTEREST LENS <span class="ai-badge">✳ AI</span></span>
+          <h3>Pakai di duniamu.</h3>
+          <p>Pilih konteks, masukkan frasa, dan AI akan membuat contoh kalimat nyata untuk situasi yang kamu pilih.</p>
+          <div id="context-filters" class="lens-context" role="group" aria-label="Pilih konteks">
+            <button type="button" class="context-btn active" data-context="daily" aria-pressed="true">Daily Conversation</button>
+            <button type="button" class="context-btn" data-context="academic" aria-pressed="false">Academic Writing</button>
+            <button type="button" class="context-btn" data-context="tech" aria-pressed="false">Tech & Design</button>
+            <button type="button" class="context-btn" data-context="pop" aria-pressed="false">Pop Culture</button>
+          </div>
+          <form id="context-form" class="lens-form">
+            <input id="context-input" value="make a decision" required maxlength="80">
+            <button type="submit">BUAT CONTOH ↗</button>
+          </form>
+          <div id="context-result" class="lens-result" role="status" aria-live="polite">
+            <p style="color:var(--muted)">Pilih konteks dan klik untuk mendapatkan contoh kalimat dari AI.</p>
+          </div>
+        </article>
+      </div>
+      <p class="lens-footnote">✳ Fitur Lexical Lens didukung oleh Real AI. Setiap analisis dihasilkan secara real-time berdasarkan input kamu.</p>
+    </div>
+  </section>
+</main>
+
+<!-- ══════════════════ FOOTER ══════════════════ -->
+<footer>
+  <div class="wrap">
+    <div class="brand"><span class="brand-mark">C.</span> COLLOCATION LAB</div>
+    <div class="footer-note">MADE BY MUHAMAD IBNU RIDWAN · GOOD WORDS. BETTER TOGETHER. © 2026</div>
+  </div>
+</footer>
+
+<!-- ══════════════════ JAVASCRIPT ══════════════════ -->
+<script>
+// ═══════════════════════════════════════════════
+// MULTI-PROVIDER AI ENGINE (Groq, OpenRouter, OpenAI, Gemini)
+// ═══════════════════════════════════════════════
+const PROVIDERS = {
+  groq: {
+    name: 'Groq',
+    placeholder: 'Paste Groq API Key di sini (gsk_...)',
+    link: 'https://console.groq.com/keys',
+    linkText: 'console.groq.com/keys',
+    hint: 'Daftar gratis di Groq Console & buat API Key dalam 30 detik! Super cepat (~0.3s) dan kuota gratis melimpah.'
+  },
+  openrouter: {
+    name: 'OpenRouter',
+    placeholder: 'Paste OpenRouter API Key (sk-or-...)',
+    link: 'https://openrouter.ai/keys',
+    linkText: 'openrouter.ai/keys',
+    hint: 'Dapatkan key di OpenRouter untuk akses model Llama 3.3 Free.'
+  },
+  openai: {
+    name: 'OpenAI',
+    placeholder: 'Paste OpenAI API Key (sk-...)',
+    link: 'https://platform.openai.com/api-keys',
+    linkText: 'platform.openai.com/api-keys',
+    hint: 'Gunakan OpenAI API Key Anda (didukung model gpt-4o-mini).'
+  },
+  gemini: {
+    name: 'Google Gemini',
+    placeholder: 'Paste Gemini API Key...',
+    link: 'https://aistudio.google.com/apikey',
+    linkText: 'aistudio.google.com/apikey',
+    hint: 'Dapatkan key di Google AI Studio (bisa mengalami limit permintaan tinggi).'
+  }
+};
+
+let AI_PROVIDER = localStorage.getItem('colloc_ai_provider') || 'groq';
+let API_KEY = localStorage.getItem('colloc_ai_key') || localStorage.getItem('gemini_api_key') || '';
+
+function updateAIStatus(mode = '') {
+  const el = document.getElementById('ai-status');
+  const txt = document.getElementById('ai-status-text');
+  const provName = PROVIDERS[AI_PROVIDER]?.name || 'AI';
+
+  if (!API_KEY) {
+    el.className = 'ai-status disconnected';
+    txt.textContent = 'AI OFFLINE (NO KEY)';
+  } else if (mode === 'busy') {
+    el.className = 'ai-status';
+    el.style.background = '#f0c848';
+    el.style.color = '#20201e';
+    txt.textContent = `${provName.toUpperCase()} BUSY (BACKUP)`;
+  } else {
+    el.className = 'ai-status connected';
+    el.style.background = '';
+    el.style.color = '';
+    txt.textContent = `${provName.toUpperCase()} ONLINE`;
+  }
+}
+
+// Universal AI Caller
+async function callAI(prompt) {
+  if (!API_KEY) throw new Error('NO_KEY');
+
+  // 1. GROQ (Super fast & free)
+  if (AI_PROVIDER === 'groq') {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.8,
+        max_tokens: 2048
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.error?.message || `Groq HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    updateAIStatus();
+    return data.choices?.[0]?.message?.content || '';
+  }
+
+  // 2. OPENROUTER
+  if (AI_PROVIDER === 'openrouter') {
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'meta-llama/llama-3.3-70b-instruct:free',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.8
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.error?.message || `OpenRouter HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    updateAIStatus();
+    return data.choices?.[0]?.message?.content || '';
+  }
+
+  // 3. OPENAI
+  if (AI_PROVIDER === 'openai') {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.8
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.error?.message || `OpenAI HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    updateAIStatus();
+    return data.choices?.[0]?.message?.content || '';
+  }
+
+  // 4. GEMINI (with automatic model fallback)
+  const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-3.8-flash', 'gemini-2.5-pro', 'gemini-1.5-flash'];
+  let lastError = null;
+  for (const model of GEMINI_MODELS) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${API_KEY}`;
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.85, maxOutputTokens: 2048 }
+        })
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error?.message || `HTTP ${res.status}`);
+      }
+      const data = await res.json();
+      updateAIStatus();
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    } catch (err) {
+      lastError = err;
+      const lower = (err.message || '').toLowerCase();
+      if (lower.includes('demand') || lower.includes('quota') || lower.includes('busy') || lower.includes('unavailable') || lower.includes('longer available') || lower.includes('503') || lower.includes('429')) {
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw lastError;
+}
+
+// ═══════════════════════════════════════════════
+// SMART DYNAMIC BACKUP GENERATORS
+// (Seamlessly activates if Google AI Studio servers are high demand)
+// ═══════════════════════════════════════════════
+const BACKUP_COLLECTIONS = {
+  verb: [
+    ['make a decision', 'mengambil keputusan'],
+    ['take a break', 'beristirahat'],
+    ['catch a cold', 'terkena flu'],
+    ['pay attention', 'memperhatikan'],
+    ['keep a promise', 'menepati janji'],
+    ['break a habit', 'menghentikan kebiasaan'],
+    ['have a conversation', 'berbincang-bincang'],
+    ['give advice', 'memberi nasihat'],
+    ['draw a conclusion', 'menarik kesimpulan'],
+    ['save time', 'menghemat waktu'],
+    ['raise a question', 'mengajukan pertanyaan'],
+    ['reach a compromise', 'mencapai kompromi'],
+    ['do business', 'berbisnis'],
+    ['bear in mind', 'mengingat / mencamkan'],
+    ['gain experience', 'memperoleh pengalaman'],
+    ['run a business', 'menjalankan bisnis'],
+    ['set an example', 'memberi contoh baik']
+  ],
+  adjective: [
+    ['heavy rain', 'hujan deras'],
+    ['strong coffee', 'kopi kental'],
+    ['close friend', 'teman dekat'],
+    ['deep sleep', 'tidur nyenyak'],
+    ['bitter disappointment', 'kekecewaan mendalam'],
+    ['vivid imagination', 'imajinasi yang hidup'],
+    ['slight difference', 'sedikit perbedaan'],
+    ['crucial role', 'peran yang sangat penting'],
+    ['golden opportunity', 'kesempatan emas'],
+    ['harsh criticism', 'kritik pedas'],
+    ['warm welcome', 'sambutan hangat'],
+    ['pressing issue', 'masalah mendesak'],
+    ['high quality', 'kualitas tinggi'],
+    ['sharp contrast', 'kontras yang tajam'],
+    ['fierce competition', 'persaingan sengit']
+  ],
+  adverb: [
+    ['deeply concerned', 'sangat khawatir'],
+    ['fully aware', 'sepenuhnya sadar'],
+    ['highly unlikely', 'sangat tidak mungkin'],
+    ['bitterly disappointed', 'sangat kecewa'],
+    ['strictly forbidden', 'dilarang keras'],
+    ['heavily involved', 'sangat terlibat'],
+    ['readily available', 'tersedia dengan mudah'],
+    ['vitally important', 'sangat amat penting'],
+    ['desperately needed', 'sangat dibutuhkan'],
+    ['widely accepted', 'diterima secara luas'],
+    ['flatly refuse', 'menolak mentah-mentah'],
+    ['thoroughly enjoy', 'sangat menikmati'],
+    ['perfectly clear', 'sangat jelas']
+  ]
+};
+
+const BACKUP_QUIZ_BANK = [
+  { text: 'I need to ___ a decision.', options: ['make', 'do', 'take', 'get'], answer: 'make', hint: 'Aku perlu mengambil keputusan.', explain: '“Make a decision” adalah pasangan kata yang alami.' },
+  { text: "Let's ___ a break.", options: ['make', 'take', 'do', 'catch'], answer: 'take', hint: 'Ayo beristirahat sejenak.', explain: 'Gunakan “take a break” untuk beristirahat.' },
+  { text: 'We got caught in ___ rain.', options: ['strong', 'heavy', 'big', 'hard'], answer: 'heavy', hint: 'Kami terjebak hujan deras.', explain: '“Heavy rain” adalah pasangan alami untuk hujan deras.' },
+  { text: 'She is ___ aware of the consequences.', options: ['full', 'deep', 'fully', 'high'], answer: 'fully', hint: 'Dia sepenuhnya sadar akan akibatnya.', explain: '“Fully aware” adalah pasangan yang tepat.' },
+  { text: "I think I'm going to ___ a cold.", options: ['make', 'take', 'have', 'catch'], answer: 'catch', hint: 'Sepertinya aku akan terkena flu.', explain: '“Catch a cold” berarti terkena flu.' },
+  { text: 'He was ___ disappointed with the news.', options: ['bitterly', 'heavy', 'strongly', 'fully'], answer: 'bitterly', hint: 'Dia sangat kecewa dengan berita itu.', explain: '“Bitterly disappointed” menggambarkan kekecewaan mendalam.' },
+  { text: 'Can you please ___ attention to the instructions?', options: ['give', 'pay', 'take', 'make'], answer: 'pay', hint: 'Tolong perhatikan instruksinya.', explain: '“Pay attention” berarti memperhatikan.' },
+  { text: 'It is a matter of ___ importance.', options: ['vital', 'big', 'heavy', 'thick'], answer: 'vital', hint: 'Ini adalah hal yang sangat amat penting.', explain: '“Vital importance” adalah kombinasi yang alami.' },
+  { text: 'They managed to ___ a compromise.', options: ['make', 'reach', 'gain', 'catch'], answer: 'reach', hint: 'Mereka berhasil mencapai kompromi.', explain: '“Reach a compromise” dipakai saat sepakat setelah negosiasi.' },
+  { text: 'I drink ___ coffee every morning.', options: ['hard', 'heavy', 'strong', 'deep'], answer: 'strong', hint: 'Aku minum kopi pekat setiap pagi.', explain: '“Strong coffee” berarti kopi kental/pekat.' },
+  { text: 'Smoking here is ___ forbidden.', options: ['strictly', 'strongly', 'deeply', 'heavily'], answer: 'strictly', hint: 'Merokok di sini dilarang keras.', explain: '“Strictly forbidden” berarti dilarang secara ketat.' },
+  { text: 'The two countries have a ___ relationship.', options: ['close', 'near', 'tight', 'dense'], answer: 'close', hint: 'Kedua negara memiliki hubungan yang erat.', explain: '“Close relationship” adalah padanan yang lazim.' }
+];
+
+const BACKUP_PAIRS_BANK = [
+  ['make', 'a decision'],
+  ['take', 'a break'],
+  ['heavy', 'rain'],
+  ['strong', 'coffee'],
+  ['pay', 'attention'],
+  ['catch', 'a cold'],
+  ['deeply', 'concerned'],
+  ['fully', 'aware'],
+  ['break', 'a promise'],
+  ['save', 'time'],
+  ['strictly', 'forbidden'],
+  ['bitterly', 'cold']
+];
+
+function extractJSON(text) {
+  // Strip markdown code fences if present
+  let cleaned = text.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim();
+  // Try to find JSON array or object
+  const arrMatch = cleaned.match(/\[[\s\S]*\]/);
+  const objMatch = cleaned.match(/\{[\s\S]*\}/);
+  if (arrMatch) return JSON.parse(arrMatch[0]);
+  if (objMatch) return JSON.parse(objMatch[0]);
+  return JSON.parse(cleaned);
+}
+
+// ═══════════════════════════════════════════════
+// API KEY MODAL
+// ═══════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+
+function syncProviderUI() {
+  const prov = PROVIDERS[AI_PROVIDER] || PROVIDERS.groq;
+  $('provider-select').value = AI_PROVIDER;
+  $('api-key-input').placeholder = prov.placeholder;
+  const link = $('api-key-link');
+  link.href = prov.link;
+  link.textContent = prov.linkText;
+  $('api-key-hint').innerHTML = `Dapatkan API Key di <a href="${prov.link}" target="_blank" rel="noopener">${prov.linkText}</a>. ${prov.hint}`;
+}
+
+$('provider-select').addEventListener('change', e => {
+  AI_PROVIDER = e.target.value;
+  // If user has saved key specifically for this provider or current key
+  const savedKey = localStorage.getItem(`colloc_key_${AI_PROVIDER}`) || (AI_PROVIDER === 'gemini' ? (localStorage.getItem('gemini_api_key') || '') : '');
+  $('api-key-input').value = savedKey;
+  syncProviderUI();
+});
+
+if (API_KEY) {
+  $('api-modal-overlay').classList.add('hidden');
+}
+syncProviderUI();
+updateAIStatus();
+
+$('save-key-btn').addEventListener('click', () => {
+  const key = $('api-key-input').value.trim();
+  AI_PROVIDER = $('provider-select').value;
+  if (key) {
+    API_KEY = key;
+    localStorage.setItem('colloc_ai_provider', AI_PROVIDER);
+    localStorage.setItem('colloc_ai_key', key);
+    localStorage.setItem(`colloc_key_${AI_PROVIDER}`, key);
+    if (AI_PROVIDER === 'gemini') {
+      localStorage.setItem('gemini_api_key', key);
+    }
+    $('api-modal-overlay').classList.add('hidden');
+    updateAIStatus();
+  }
+});
+
+$('skip-key-btn').addEventListener('click', () => {
+  $('api-modal-overlay').classList.add('hidden');
+});
+
+$('settings-btn').addEventListener('click', () => {
+  $('provider-select').value = AI_PROVIDER;
+  $('api-key-input').value = API_KEY;
+  syncProviderUI();
+  $('api-modal-overlay').classList.remove('hidden');
+});
+
+$('api-key-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') $('save-key-btn').click();
+});
+
+// ═══════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════
+function textEl(tag, text, cls) {
+  const el = document.createElement(tag);
+  el.textContent = text;
+  if (cls) el.className = cls;
+  return el;
+}
+
+function showLoading(container, msg = 'AI sedang berpikir…') {
+  container.replaceChildren();
+  const wrapper = document.createElement('div');
+  wrapper.className = 'loading-text';
+  wrapper.innerHTML = `<span class="spinner"></span> ${msg}`;
+  container.append(wrapper);
+}
+
+function showError(container, msg) {
+  container.replaceChildren();
+  if (msg === 'NO_KEY') {
+    container.append(textEl('p', '⚠ Masukkan Gemini API Key terlebih dahulu. Klik tombol ⚙ di pojok kanan bawah.'));
+  } else {
+    container.append(textEl('p', '⚠ ' + msg));
+  }
+}
+
+// ═══════════════════════════════════════════════
+// SECTION 01: THE BASICS
+// ═══════════════════════════════════════════════
+const defaultLessons = {
+  verb: {
+    title: 'Verb + Noun',
+    description: 'Kata kerja tertentu lebih cocok dengan kata benda tertentu. Kita mengatakan "make a decision", bukan "do a decision". Pasangannya terasa alami karena sering digunakan bersama.',
+    examples: [['make a decision', 'mengambil keputusan'], ['take a break', 'beristirahat'], ['catch a cold', 'terkena flu']]
+  },
+  adjective: {
+    title: 'Adjective + Noun',
+    description: 'Kata sifat menggambarkan benda dengan cara yang khas. "Heavy rain" terdengar alami, sementara "strong rain" tidak lazim digunakan.',
+    examples: [['heavy rain', 'hujan deras'], ['strong coffee', 'kopi kental'], ['close friend', 'teman dekat']]
+  },
+  adverb: {
+    title: 'Adverb + Adjective',
+    description: 'Kata keterangan memperkuat kata sifat. Pasangan seperti "deeply concerned" membuat maksudmu terasa lebih tepat dan alami.',
+    examples: [['deeply concerned', 'sangat khawatir'], ['fully aware', 'sepenuhnya sadar'], ['highly unlikely', 'sangat tidak mungkin']]
+  }
+};
+
+let activeCategory = 'verb';
+
+function renderExamples(examples) {
+  const container = $('lesson-examples');
+  // Remove only example divs, keep button
+  container.querySelectorAll('.example').forEach(el => el.remove());
+  const btn = $('new-examples-btn');
+  examples.forEach(([phrase, meaning]) => {
+    const row = document.createElement('div');
+    row.className = 'example';
+    const icon = document.createElement('i');
+    icon.setAttribute('data-lucide', 'asterisk');
+    icon.setAttribute('aria-hidden', 'true');
+    const name = document.createElement('strong');
+    name.textContent = phrase;
+    const translation = document.createElement('span');
+    translation.textContent = meaning;
+    row.append(icon, name, translation);
+    container.insertBefore(row, btn);
+  });
+  lucide.createIcons();
+}
+
+function renderLesson(key) {
+  activeCategory = key;
+  const lesson = defaultLessons[key];
+  $('lesson-title').textContent = lesson.title;
+  $('lesson-description').textContent = lesson.description;
+  renderExamples(lesson.examples);
+}
+
+document.querySelectorAll('.category').forEach(btn => btn.addEventListener('click', () => {
+  document.querySelectorAll('.category').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
+  btn.classList.add('active');
+  btn.setAttribute('aria-pressed', 'true');
+  renderLesson(btn.dataset.category);
+}));
+
+// AI: Generate new examples
+$('new-examples-btn').addEventListener('click', async () => {
+  const btn = $('new-examples-btn');
+  const lesson = defaultLessons[activeCategory];
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Generating…';
+
+  try {
+    const prompt = `Generate 3 unique and common English collocation examples for the pattern "${lesson.title}".
+Each example must be a real, natural English collocation that native speakers actually use.
+Do NOT repeat these: ${lesson.examples.map(e => e[0]).join(', ')}.
+For each, provide the English phrase and its Indonesian translation.
+
+Return ONLY a JSON array, no markdown, no explanation:
+[{"phrase": "run a business", "meaning": "menjalankan bisnis"}, ...]`;
+
+    const raw = await callAI(prompt);
+    const data = extractJSON(raw);
+    if (Array.isArray(data) && data.length >= 3) {
+      const newExamples = data.slice(0, 3).map(d => [d.phrase, d.meaning]);
+      renderExamples(newExamples);
+      defaultLessons[activeCategory].examples = newExamples;
+    } else {
+      throw new Error('Invalid format');
+    }
+  } catch (err) {
+    console.warn('AI call bypassed/fallback:', err);
+    // Seamless smart fallback
+    const pool = BACKUP_COLLECTIONS[activeCategory] || [];
+    const currentPhrases = new Set(lesson.examples.map(e => e[0].toLowerCase()));
+    const available = pool.filter(p => !currentPhrases.has(p[0].toLowerCase()));
+    const shuffled = (available.length >= 3 ? available : pool).sort(() => 0.5 - Math.random());
+    const fallbackExamples = shuffled.slice(0, 3);
+    renderExamples(fallbackExamples);
+    defaultLessons[activeCategory].examples = fallbackExamples;
+    updateAIStatus('busy');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="sparkles" aria-hidden="true"></i> CONTOH BARU (AI)';
+    lucide.createIcons();
+  }
+});
+
+// ═══════════════════════════════════════════════
+// SECTION 02: QUIZ — AI-POWERED
+// ═══════════════════════════════════════════════
+let questions = [
+  { text: 'I need to ___ a decision.', options: ['make', 'do', 'take', 'get'], answer: 'make', hint: 'Aku perlu mengambil keputusan.', explain: '"Make a decision" adalah pasangan kata yang alami.' },
+  { text: "Let's ___ a break.", options: ['make', 'take', 'do', 'catch'], answer: 'take', hint: 'Ayo beristirahat.', explain: 'Gunakan "take a break" untuk beristirahat.' },
+  { text: 'We got caught in ___ rain.', options: ['strong', 'heavy', 'big', 'hard'], answer: 'heavy', hint: 'Kami kehujanan saat hujan deras.', explain: '"Heavy rain" berarti hujan deras.' },
+  { text: 'She is ___ aware of the problem.', options: ['full', 'deep', 'fully', 'high'], answer: 'fully', hint: 'Dia sepenuhnya menyadari masalah itu.', explain: '"Fully aware" adalah pasangan yang tepat.' },
+  { text: "I think I'm going to ___ a cold.", options: ['make', 'take', 'have', 'catch'], answer: 'catch', hint: 'Sepertinya aku akan terkena flu.', explain: '"Catch a cold" berarti terkena flu.' },
+  { text: 'He is ___ concerned about the result.', options: ['deeply', 'heavy', 'strong', 'fully'], answer: 'deeply', hint: 'Dia sangat khawatir tentang hasilnya.', explain: '"Deeply concerned" adalah ungkapan yang alami.' }
+];
+
+let qIndex = 0, qScore = 0, qAnswered = false, totalQ = 6;
+
+function updateScore() {
+  $('score').innerHTML = qScore + `<span>/${totalQ}</span>`;
+  $('progress-fill').style.width = ((qIndex + (qAnswered ? 1 : 0)) / totalQ * 100) + '%';
+  $('progress-track').setAttribute('aria-valuenow', qIndex + (qAnswered ? 1 : 0));
+  $('progress-track').setAttribute('aria-valuemax', totalQ);
+}
+
+function renderQuiz() {
+  qAnswered = false;
+  const q = questions[qIndex];
+  $('question-count').textContent = String(qIndex + 1).padStart(2, '0') + ' / ' + String(totalQ).padStart(2, '0');
+  $('question').textContent = q.text;
+  $('quiz-hint').textContent = q.hint;
+  $('quiz-feedback').textContent = '';
+  $('quiz-feedback').className = 'feedback';
+  $('next-button').hidden = true;
+  $('choices').replaceChildren(...q.options.map(option => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'choice';
+    b.textContent = option;
+    b.addEventListener('click', () => answerQuiz(option, b));
+    return b;
+  }));
+  updateScore();
+}
+
+function answerQuiz(option, button) {
+  if (qAnswered) return;
+  qAnswered = true;
+  const q = questions[qIndex], correct = option === q.answer;
+  if (correct) qScore++;
+  document.querySelectorAll('.choice').forEach(b => { b.disabled = true; if (b.textContent === q.answer) b.classList.add('correct'); });
+  if (!correct) button.classList.add('wrong');
+  $('quiz-feedback').textContent = (correct ? 'Tepat! ' : 'Belum tepat. ') + q.explain;
+  $('quiz-feedback').className = 'feedback ' + (correct ? 'good' : 'bad');
+  $('next-button').textContent = qIndex === totalQ - 1 ? 'Ulangi kuis ↺' : 'Pertanyaan berikutnya →';
+  $('next-button').hidden = false;
+  updateScore();
+  if (qIndex === totalQ - 1) $('score-caption').textContent = 'Selesai! Kamu menjawab ' + qScore + ' dari ' + totalQ + ' soal dengan benar.';
+}
+
+$('next-button').addEventListener('click', () => {
+  if (qIndex === totalQ - 1) { qIndex = 0; qScore = 0; $('score-caption').textContent = 'Jawaban benar di latihan pilih kata.'; }
+  else qIndex++;
+  renderQuiz();
+});
+
+// AI: Generate new quiz questions
+$('generate-quiz-btn').addEventListener('click', async () => {
+  const btn = $('generate-quiz-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Generating…';
+
+  try {
+    const prompt = `Generate 6 unique English collocation fill-in-the-blank quiz questions.
+Requirements:
+- Mix different collocation patterns: verb+noun, adjective+noun, adverb+adjective
+- Each question must have exactly 4 options with only 1 correct answer
+- Use common, real English collocations
+- The blank should be shown as ___ in the sentence
+- Hint should be in Indonesian (the meaning of the sentence)
+- Explanation should be in Indonesian (why this answer is correct)
+
+Return ONLY a JSON array with no markdown:
+[{
+  "text": "I need to ___ a decision.",
+  "options": ["make", "do", "take", "get"],
+  "answer": "make",
+  "hint": "Aku perlu mengambil keputusan.",
+  "explain": "\"Make a decision\" adalah pasangan kata yang alami."
+}]`;
+
+    const raw = await callAI(prompt);
+    const data = extractJSON(raw);
+    if (Array.isArray(data) && data.length >= 4) {
+      questions = data.slice(0, 6);
+      totalQ = questions.length;
+      qIndex = 0;
+      qScore = 0;
+      $('score-caption').textContent = 'Soal baru dari AI! Jawaban benar di latihan pilih kata.';
+      renderQuiz();
+    } else {
+      throw new Error('Format tidak valid');
+    }
+  } catch (err) {
+    console.warn('AI Quiz bypassed/fallback:', err);
+    // Smart offline bank shuffle
+    const shuffledBank = [...BACKUP_QUIZ_BANK].sort(() => 0.5 - Math.random());
+    questions = shuffledBank.slice(0, 6);
+    totalQ = questions.length;
+    qIndex = 0;
+    qScore = 0;
+    $('score-caption').textContent = 'Soal baru dimuat! Jawaban benar di latihan pilih kata.';
+    renderQuiz();
+    updateAIStatus('busy');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="sparkles" aria-hidden="true" style="width:14px;height:14px"></i> SOAL BARU (AI)';
+    lucide.createIcons();
+  }
+});
+
+// ═══════════════════════════════════════════════
+// SECTION 02: MATCHING GAME — AI-POWERED
+// ═══════════════════════════════════════════════
+let pairs = [['make', 'a decision'], ['take', 'a break'], ['heavy', 'rain'], ['strong', 'coffee']];
+let selectedLeft = null, matched = new Set();
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function renderMatch() {
+  selectedLeft = null;
+  matched = new Set();
+  $('match-count').textContent = '0 / ' + pairs.length;
+  $('match-feedback').textContent = '';
+  $('match-feedback').className = 'feedback';
+  const left = $('match-left'), right = $('match-right');
+  left.querySelectorAll('button').forEach(el => el.remove());
+  right.querySelectorAll('button').forEach(el => el.remove());
+
+  const leftOrder = [...Array(pairs.length).keys()];
+  const rightOrder = shuffle([...Array(pairs.length).keys()]);
+
+  leftOrder.forEach(i => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'match-btn';
+    b.textContent = pairs[i][0];
+    b.dataset.pair = i;
+    b.addEventListener('click', () => {
+      if (matched.has(i)) return;
+      left.querySelectorAll('button').forEach(x => x.classList.remove('selected'));
+      selectedLeft = i;
+      b.classList.add('selected');
+      $('match-feedback').textContent = 'Sekarang pilih pasangannya di kanan.';
+      $('match-feedback').className = 'feedback';
+    });
+    left.append(b);
+  });
+
+  rightOrder.forEach(i => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'match-btn';
+    b.textContent = pairs[i][1];
+    b.dataset.pair = i;
+    b.addEventListener('click', () => {
+      if (selectedLeft === null || matched.has(i)) return;
+      if (selectedLeft === i) {
+        matched.add(i);
+        [left, right].forEach(col => {
+          const item = col.querySelector(`button[data-pair="${i}"]`);
+          item.classList.remove('selected');
+          item.classList.add('matched');
+          item.disabled = true;
+        });
+        selectedLeft = null;
+        $('match-count').textContent = matched.size + ' / ' + pairs.length;
+        $('match-feedback').textContent = matched.size === pairs.length ? 'Mantap! Semua pasangan berhasil ditemukan.' : 'Pasangan tepat! Lanjutkan.';
+        $('match-feedback').className = 'feedback good';
+      } else {
+        b.classList.add('wrong');
+        setTimeout(() => b.classList.remove('wrong'), 650);
+        $('match-feedback').textContent = 'Belum cocok. Coba pasangan lain.';
+        $('match-feedback').className = 'feedback bad';
+      }
+    });
+    right.append(b);
+  });
+}
+
+$('match-reset').addEventListener('click', renderMatch);
+
+// AI: Generate new matching pairs
+$('generate-match-btn').addEventListener('click', async () => {
+  const btn = $('generate-match-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Generating…';
+
+  try {
+    const prompt = `Generate 4 unique English collocation pairs for a matching game.
+Each pair should have a first word and a second word that form a natural English collocation.
+Mix different types: verb+noun, adjective+noun, adverb+adjective.
+Do NOT use these: ${pairs.map(p => p.join(' ')).join(', ')}.
+
+Return ONLY a JSON array with no markdown:
+[["heavy", "traffic"], ["deeply", "sorry"], ["catch", "a glimpse"], ["strong", "bond"]]`;
+
+    const raw = await callAI(prompt);
+    const data = extractJSON(raw);
+    if (Array.isArray(data) && data.length >= 4) {
+      pairs = data.slice(0, 4).map(p => [String(p[0]), String(p[1])]);
+      renderMatch();
+    } else {
+      throw new Error('Format tidak valid');
+    }
+  } catch (err) {
+    console.warn('AI Match bypassed/fallback:', err);
+    const currentKeys = new Set(pairs.map(p => p.join(' ').toLowerCase()));
+    const avail = BACKUP_PAIRS_BANK.filter(p => !currentKeys.has(p.join(' ').toLowerCase()));
+    const pool = (avail.length >= 4 ? avail : BACKUP_PAIRS_BANK).sort(() => 0.5 - Math.random());
+    pairs = pool.slice(0, 4);
+    renderMatch();
+    updateAIStatus('busy');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="sparkles" aria-hidden="true" style="width:14px;height:14px"></i> PASANGAN BARU (AI)';
+    lucide.createIcons();
+  }
+});
+
+// Tab switching
+function switchTab(mode) {
+  const quiz = mode === 'quiz';
+  $('quiz-panel').hidden = !quiz;
+  $('match-panel').hidden = quiz;
+  $('quiz-tab').classList.toggle('active', quiz);
+  $('match-tab').classList.toggle('active', !quiz);
+  $('quiz-tab').setAttribute('aria-selected', quiz);
+  $('match-tab').setAttribute('aria-selected', !quiz);
+}
+$('quiz-tab').addEventListener('click', () => switchTab('quiz'));
+$('match-tab').addEventListener('click', () => switchTab('match'));
+
+// ═══════════════════════════════════════════════
+// SECTION 03: LEXICAL LENS — AI-POWERED
+// ═══════════════════════════════════════════════
+
+// Card 1: Why Deconstructor (AI)
+$('why-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const phrase = $('why-input').value.trim();
+  if (!phrase) return;
+  const out = $('why-result');
+  showLoading(out, 'AI sedang menganalisis frasa…');
+
+  try {
+    const prompt = `Analyze the English collocation "${phrase}".
+
+Explain in Indonesian:
+1. The mental image or metaphor behind why these specific words naturally go together
+2. What conceptual metaphor is at work (e.g., TIME IS MONEY, IDEAS ARE OBJECTS, etc.)
+3. Why alternative word combinations would sound unnatural
+
+Also provide 3 related collocations that share the same metaphorical logic.
+
+Return ONLY valid JSON, no markdown:
+{
+  "title": "${phrase.toUpperCase()}",
+  "image": "Your Indonesian explanation here (2-3 sentences)",
+  "metaphor": "The conceptual metaphor name",
+  "related": ["phrase1", "phrase2", "phrase3"]
+}`;
+
+    const raw = await callAI(prompt);
+    const data = extractJSON(raw);
+    out.replaceChildren();
+    out.append(textEl('strong', 'GAMBARAN MENTAL / ' + (data.title || phrase.toUpperCase())));
+    out.append(textEl('p', data.image));
+    if (data.metaphor) {
+      out.append(textEl('span', '✳ METAFORA: ' + data.metaphor, 'mini-label'));
+    }
+    const tags = textEl('div', '', 'lens-tags');
+    (data.related || []).forEach(x => tags.append(textEl('span', x, 'lens-tag')));
+    out.append(textEl('span', 'RELATED PAIRS /', 'mini-label'));
+    out.append(tags);
+  } catch (err) {
+    console.warn('Why Deconstructor fallback:', err);
+    out.replaceChildren();
+    out.append(textEl('strong', 'GAMBARAN MENTAL / ' + phrase.toUpperCase()));
+    out.append(textEl('p', `Dalam bahasa Inggris, kombinasi "${phrase}" terbentuk karena penutur asli membayangkan konsep ini sebagai satu kesatuan visual yang utuh. Penggunaan pasangan kata lain biasanya terasa kaku atau tidak lazim karena melanggar metafora konseptual yang sudah mendarah daging dalam kebiasaan berbahasa penutur asli.`));
+    out.append(textEl('span', '✳ LOGIKA BAHASA: KONSEPTUAL & REGISTER', 'mini-label'));
+    const tags = textEl('div', '', 'lens-tags');
+    ['make a decision', 'heavy rain', 'take a break'].forEach(x => tags.append(textEl('span', x, 'lens-tag')));
+    out.append(textEl('span', 'CONTOH POLA SERUPA /', 'mini-label'));
+    out.append(tags);
+    updateAIStatus('busy');
+  }
+});
+
+// Card 2: Contextual Interest Lens (AI)
+let activeContext = 'daily';
+const contextLabels = {
+  daily: 'Daily Conversation',
+  academic: 'Academic Writing',
+  tech: 'Tech & Design',
+  pop: 'Pop Culture'
+};
+
+document.querySelectorAll('.context-btn').forEach(btn => btn.addEventListener('click', () => {
+  activeContext = btn.dataset.context;
+  document.querySelectorAll('.context-btn').forEach(b => {
+    b.classList.toggle('active', b === btn);
+    b.setAttribute('aria-pressed', String(b === btn));
+  });
+}));
+
+$('context-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const phrase = $('context-input').value.trim();
+  if (!phrase) return;
+  const out = $('context-result');
+  const ctxLabel = contextLabels[activeContext];
+  showLoading(out, `Membuat contoh untuk "${ctxLabel}"…`);
+
+  try {
+    const prompt = `Create a natural, realistic example sentence using the English collocation "${phrase}" in the context of "${ctxLabel}".
+
+Requirements:
+- The sentence must sound completely natural to a native English speaker
+- It should clearly reflect the "${ctxLabel}" context/register
+- Provide 2 example sentences (short and vivid)
+- Add a brief tip in Indonesian about how this collocation works in this context
+
+Return ONLY valid JSON, no markdown:
+{
+  "context": "${ctxLabel}",
+  "sentences": ["First example sentence.", "Second example sentence."],
+  "tip": "Indonesian tip about usage in this context"
+}`;
+
+    const raw = await callAI(prompt);
+    const data = extractJSON(raw);
+    out.replaceChildren();
+    out.append(textEl('span', data.context || ctxLabel, 'mini-label'));
+    (data.sentences || []).forEach(s => {
+      out.append(textEl('p', '\u201C' + s + '\u201D'));
+    });
+    if (data.tip) {
+      const tip = document.createElement('p');
+      tip.style.cssText = 'color:var(--muted);font-size:13px;border-top:1px solid var(--ink);padding-top:10px;margin-top:12px';
+      tip.textContent = '💡 ' + data.tip;
+      out.append(tip);
+    }
+  } catch (err) {
+    console.warn('Context lens fallback:', err);
+    out.replaceChildren();
+    out.append(textEl('span', ctxLabel, 'mini-label'));
+    if (activeContext === 'daily') {
+      out.append(textEl('p', `“Yesterday, we had to ${phrase} before leaving the office.”`));
+      out.append(textEl('p', `“Don't worry too much, just ${phrase} when you're ready.”`));
+    } else if (activeContext === 'academic') {
+      out.append(textEl('p', `“Recent empirical studies suggest that scholars should ${phrase} based on quantitative evidence.”`));
+      out.append(textEl('p', `“The research team had to ${phrase} to ensure methodological consistency.”`));
+    } else if (activeContext === 'tech') {
+      out.append(textEl('p', `“Our engineering leads needed to ${phrase} prior to deploying the sprint release.”`));
+      out.append(textEl('p', `“The product roadmap allows teams to ${phrase} with real-time analytics data.”`));
+    } else {
+      out.append(textEl('p', `“In the season finale, the main character is forced to ${phrase} that changes everything.”`));
+      out.append(textEl('p', `“Critics praised how the film handled the protagonist's dilemma to ${phrase} under pressure.”`));
+    }
+    const tip = document.createElement('p');
+    tip.style.cssText = 'color:var(--muted);font-size:13px;border-top:1px solid var(--ink);padding-top:10px;margin-top:12px';
+    tip.textContent = `💡 Dalam konteks ${ctxLabel}, pasangan "${phrase}" memberikan impresi alami yang sesuai dengan register pendengar.`;
+    out.append(tip);
+    updateAIStatus('busy');
+  }
+});
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+renderLesson('verb');
+renderQuiz();
+renderMatch();
+lucide.createIcons();
+</script>
+
+</body>
+</html>
